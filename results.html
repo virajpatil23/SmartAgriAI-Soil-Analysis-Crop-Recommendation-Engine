@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌾 Agriculture Analysis Results</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1><i class="fas fa-chart-line"></i> Soil Health Prediction System</h1>
+            <p>Comprehensive soil health analysis and crop recommendations</p>
+        </header>
+
+        <div class="results-summary">
+            <div class="summary-card">
+                <h3><i class="fas fa-thermometer-half"></i> Climate</h3>
+                <p>{{ form_data.temperature }}°C, {{ form_data.humidity }}% humidity</p>
+                <p>{{ form_data.rainfall }}mm rainfall</p>
+            </div>
+            <div class="summary-card">
+                <h3><i class="fas fa-seedling"></i> Soil Type</h3>
+                <p>{{ form_data.soil_type|title }} soil</p>
+                <p>{{ form_data.season|title }} season</p>
+            </div>
+            <div class="summary-card">
+                <h3><i class="fas fa-vial"></i> pH Level</h3>
+                <p class="ph-value">{{ form_data.ph }}</p>
+                <p class="ph-status">
+                    {% if form_data.ph|float < 6.0 %}
+                        <span class="acidic">Acidic</span>
+                    {% elif form_data.ph|float > 8.0 %}
+                        <span class="alkaline">Alkaline</span>
+                    {% else %}
+                        <span class="optimal">Optimal</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+
+        <!-- Soil Analysis Results -->
+        <div class="results-section">
+            <h2><i class="fas fa-microscope"></i> Soil Analysis Results</h2>
+            <div class="analysis-grid">
+                {% for analysis in results.soil_analysis %}
+                <div class="analysis-item">
+                    <div class="analysis-icon">
+                        {% if 'ACIDIC' in analysis %}
+                            <i class="fas fa-exclamation-triangle acidic"></i>
+                        {% elif 'ALKALINE' in analysis %}
+                            <i class="fas fa-exclamation-triangle alkaline"></i>
+                        {% elif 'LOW' in analysis %}
+                            <i class="fas fa-arrow-down low"></i>
+                        {% elif 'HIGH' in analysis %}
+                            <i class="fas fa-arrow-up high"></i>
+                        {% else %}
+                            <i class="fas fa-check-circle optimal"></i>
+                        {% endif %}
+                    </div>
+                    <p>{{ analysis }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Recommended Crops -->
+        <div class="results-section">
+            <h2><i class="fas fa-leaf"></i> Recommended Crop Sequence</h2>
+            <div class="crops-grid">
+                {% for crop in results.recommended_crops %}
+                <div class="crop-card">
+                    <div class="crop-icon">
+                        {% if crop == 'Rice' %}
+                            <i class="fas fa-seedling"></i>
+                        {% elif crop == 'Wheat' %}
+                            <i class="fas fa-wheat-alt"></i>
+                        {% elif crop == 'Cotton' %}
+                            <i class="fas fa-cloud"></i>
+                        {% elif crop == 'Tea' or crop == 'Coffee' %}
+                            <i class="fas fa-coffee"></i>
+                        {% else %}
+                            <i class="fas fa-leaf"></i>
+                        {% endif %}
+                    </div>
+                    <h3>{{ crop }}</h3>
+                    <p class="crop-priority">Priority {{ loop.index }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Fertilizer Recommendations -->
+        <div class="results-section">
+            <h2><i class="fas fa-flask"></i> Fertilizer Recommendations</h2>
+            <div class="fertilizer-list">
+                {% for recommendation in results.fertilizer_recommendations %}
+                <div class="fertilizer-item">
+                    <div class="fertilizer-icon">
+                        {% if 'Urea' in recommendation %}
+                            <i class="fas fa-tint nitrogen"></i>
+                        {% elif 'DAP' in recommendation %}
+                            <i class="fas fa-fire phosphorus"></i>
+                        {% elif 'MOP' in recommendation %}
+                            <i class="fas fa-gem potassium"></i>
+                        {% elif 'Zinc' in recommendation %}
+                            <i class="fas fa-atom micronutrient"></i>
+                        {% elif 'Iron' in recommendation %}
+                            <i class="fas fa-magnet micronutrient"></i>
+                        {% elif 'Borax' in recommendation %}
+                            <i class="fas fa-cube micronutrient"></i>
+                        {% elif 'Manure' in recommendation or 'Compost' in recommendation %}
+                            <i class="fas fa-recycle organic"></i>
+                        {% elif 'Lime' in recommendation %}
+                            <i class="fas fa-balance-scale ph-correction"></i>
+                        {% elif 'Gypsum' in recommendation %}
+                            <i class="fas fa-mountain ph-correction"></i>
+                        {% else %}
+                            <i class="fas fa-flask"></i>
+                        {% endif %}
+                    </div>
+                    <p>{{ recommendation }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Application Schedule -->
+        <div class="results-section">
+            <h2><i class="fas fa-calendar-alt"></i> Application Schedule</h2>
+            <div class="schedule-timeline">
+                {% for step in results.application_schedule %}
+                <div class="schedule-step">
+                    <div class="step-number">{{ loop.index }}</div>
+                    <div class="step-content">
+                        <h4>
+                            {% if 'BASAL' in step %}
+                                <i class="fas fa-play-circle"></i> Initial Application
+                            {% elif 'days' in step %}
+                                <i class="fas fa-clock"></i> Follow-up Application
+                            {% else %}
+                                <i class="fas fa-tasks"></i> Additional Step
+                            {% endif %}
+                        </h4>
+                        <p>{{ step }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Soil Improvement Tips -->
+        <div class="results-section">
+            <h2><i class="fas fa-lightbulb"></i> Soil Improvement Tips</h2>
+            <div class="tips-grid">
+                {% for tip in results.soil_improvement_tips %}
+                <div class="tip-card">
+                    <div class="tip-icon">
+                        {% if 'organic matter' in tip.lower() %}
+                            <i class="fas fa-recycle"></i>
+                        {% elif 'irrigation' in tip.lower() %}
+                            <i class="fas fa-tint"></i>
+                        {% elif 'drainage' in tip.lower() %}
+                            <i class="fas fa-water"></i>
+                        {% elif 'crop rotation' in tip.lower() %}
+                            <i class="fas fa-sync-alt"></i>
+                        {% elif 'testing' in tip.lower() %}
+                            <i class="fas fa-vial"></i>
+                        {% elif 'liming' in tip.lower() or 'gypsum' in tip.lower() %}
+                            <i class="fas fa-balance-scale"></i>
+                        {% elif 'tillage' in tip.lower() %}
+                            <i class="fas fa-tools"></i>
+                        {% else %}
+                            <i class="fas fa-leaf"></i>
+                        {% endif %}
+                    </div>
+                    <p>{{ tip }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="results-actions">
+            <button onclick="window.print()" class="btn-primary">
+                <i class="fas fa-print"></i> Print Report
+            </button>
+            <button onclick="downloadPDF()" class="btn-secondary">
+                <i class="fas fa-download"></i> Download PDF
+            </button>
+            <a href="/" class="btn-tertiary">
+                <i class="fas fa-arrow-left"></i> New Analysis
+            </a>
+        </div>
+    </div>
+
+    <footer class="results-footer">
+        <p><i class="fas fa-info-circle"></i> This analysis is based on the provided soil parameters. For best results, conduct regular soil testing and consult with local agricultural experts.</p>
+        <p>Generated on: <span id="current-date"></span></p>
+    </footer>
+
+    <script>
+        // Set current date
+        document.getElementById('current-date').textContent = new Date().toLocaleDateString();
+
+        // PDF download functionality (placeholder)
+        function downloadPDF() {
+            alert('PDF download functionality would be implemented here using libraries like jsPDF or server-side PDF generation.');
+        }
+
+        // Print styling
+        window.addEventListener('beforeprint', function() {
+            document.body.classList.add('printing');
+        });
+
+        window.addEventListener('afterprint', function() {
+            document.body.classList.remove('printing');
+        });
+    </script>
+</body>
+</html>
